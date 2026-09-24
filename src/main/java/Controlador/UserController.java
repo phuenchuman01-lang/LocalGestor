@@ -38,6 +38,17 @@ public class UserController {
         return false;
     }
 
+    public String buscarUbicacionItem(String nombreItem) {
+        for (Casilla casilla : inventarioCasillas) {
+            for (Item item : casilla.getItems()) {
+                if (item.getNombre().equalsIgnoreCase(nombreItem)) {
+                    return "El objeto '" + nombreItem + "' se encuentra en la casilla: " + casilla.getIdCasilla();
+                }
+            }
+        }
+        return "Objeto no encontrado en el sistema.";
+    }
+
     private void registrarAccion(String idUsuario, String accion, String detalle) {
         auditoria.add(new RegistroHistorial(idUsuario, accion, detalle));
     }
