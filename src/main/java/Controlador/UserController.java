@@ -25,6 +25,19 @@ public class UserController {
         return false;
     }
 
+    public boolean retirarItem(String idCasilla, String idItem, String idUsuario) {
+        for (Casilla casilla : inventarioCasillas) {
+            if (casilla.getIdCasilla().equals(idCasilla) && idUsuario.equals(casilla.getIdUsuarioAsignado())) {
+                boolean removido = casilla.removerItem(idItem);
+                if (removido) {
+                    registrarAccion(idUsuario, "RETIRO_ITEM", "Retiró item ID: " + idItem + " de " + idCasilla);
+                }
+                return removido;
+            }
+        }
+        return false;
+    }
+
     private void registrarAccion(String idUsuario, String accion, String detalle) {
         auditoria.add(new RegistroHistorial(idUsuario, accion, detalle));
     }
