@@ -11,7 +11,6 @@ public class AuthController {
 
     public AuthController() {
         this.usuarios = new HashMap<>();
-        // El administrador se crea por defecto y no se puede eliminar
         this.usuarios.put("admin", new Usuario("admin", "Administrador Principal", RolUsuario.ADMIN));
     }
 }
