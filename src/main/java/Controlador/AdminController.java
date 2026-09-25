@@ -2,6 +2,7 @@ package Controlador;
 
 import Modelo.Casilla;
 import Modelo.RegistroHistorial;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,6 +21,20 @@ public class AdminController {
             inventarioCasillas.add(new Casilla(idCasilla));
         }
         registrarAccion(idAdmin, "CREACION_MODULO", "Se agregaron " + cantidad + " casillas (" + prefijo + ")");
+    }
+
+    public void asignarCasilla(String idCasilla, String idUsuario, String idAdmin) {
+        for (Casilla casilla : inventarioCasillas) {
+            if (casilla.getIdCasilla().equals(idCasilla)) {
+                casilla.setIdUsuarioAsignado(idUsuario);
+                registrarAccion(idAdmin, "ASIGNACION", "Casilla " + idCasilla + " asignada a " + idUsuario);
+                break;
+            }
+        }
+    }
+
+    public List<RegistroHistorial> verHistorial() {
+        return new ArrayList<>(auditoria);
     }
 
     private void registrarAccion(String idUsuario, String accion, String detalle) {
