@@ -13,4 +13,21 @@ public class AuthController {
         this.usuarios = new HashMap<>();
         this.usuarios.put("admin", new Usuario("admin", "Administrador Principal", RolUsuario.ADMIN));
     }
+
+    public boolean iniciarSesion(String idUsuario) {
+        if (usuarios.containsKey(idUsuario)) {
+            this.usuarioActual = usuarios.get(idUsuario);
+            return true;
+        }
+        return false;
+    }
+
+    public void cerrarSesion() {
+        this.usuarioActual = null;
+    }
+
+    public Usuario getUsuarioActual() {
+        return usuarioActual;
+    }
+    
 }
