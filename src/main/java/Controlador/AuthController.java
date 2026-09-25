@@ -29,5 +29,9 @@ public class AuthController {
     public Usuario getUsuarioActual() {
         return usuarioActual;
     }
-    
+    public void registrarUsuario(String id, String nombre, RolUsuario rol) {
+        if (!usuarios.containsKey(id)) {
+            usuarios.put(id, new Usuario(id, nombre, rol));
+        }
+    }
 }
