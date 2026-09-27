@@ -4,6 +4,7 @@ import Controlador.AdminController;
 import Controlador.AuthController;
 import Controlador.UserController;
 import Modelo.Casilla;
+import Modelo.Item;
 import Modelo.RegistroHistorial;
 import Modelo.RolUsuario;
 
@@ -103,6 +104,65 @@ public class VistaConsola {
     }
 
     private void menuUsuario() {
+        boolean enMenu = true;
+        String idActual = auth.getUsuarioActual().getIdUsuario();
+
+        while (enMenu) {
+            System.out.println("\n Panel de Usuario ");
+            System.out.println("1. Guardar objeto en mi casilla");
+            System.out.println("2. Retirar objeto");
+            System.out.println("3. Buscar ubicación de un objeto");
+            System.out.println("4. Ver estado de contenedores (Matriz)");
+            System.out.println("5. Cerrar sesión");
+            System.out.print("Opción: ");
+            String opcion = scanner.nextLine();
+
+            switch (opcion) {
+                case "1":
+                    System.out.print("ID de su casilla: ");
+                    String idCasilla = scanner.nextLine();
+                    System.out.print("Nombre del objeto: ");
+                    String nombreItem = scanner.nextLine();
+                    System.out.print("Cantidad: ");
+                    int cantidad = Integer.parseInt(scanner.nextLine());
+
+                    boolean guardado = userCtrl.guardarItem(idCasilla, new Item(nombreItem, cantidad), idActual);
+                    if (guardado) {
+                        System.out.println("Objeto guardado exitosamente.");
+                    } else {
+                        System.out.println("Error: Verifique que la casilla exista y le pertenezca.");
+                    }
+                    break;
+                case "2":
+                    System.out.print("ID de su casilla: ");
+                    String idCasillaRetiro = scanner.nextLine();
+                    System.out.print("ID del objeto a retirar: ");
+                    String idItem = scanner.nextLine();
+
+                    boolean retirado = userCtrl.retirarItem(idCasillaRetiro, idItem, idActual);
+                    if (retirado) {
+                        System.out.println("Objeto retirado.");
+                    } else {
+                        System.out.println("No se pudo retirar el objeto. Verifique los IDs.");
+                    }
+                    break;
+                case "3":
+                    System.out.print("Ingrese el nombre del objeto a buscar: ");
+                    String busqueda = scanner.nextLine();
+                    String resultado = userCtrl.buscarUbicacionItem(busqueda);
+                    System.out.println(resultado);
+                    break;
+                case "4":
+                    mostrarMatrizCasillas();
+                    break;
+                case "5":
+                    enMenu = false;
+                    auth.cerrarSesion();
+                    break;
+                default:
+                    System.out.println("Opción no válida.");
+            }
+        }
     }
 
 
