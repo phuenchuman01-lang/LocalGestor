@@ -167,5 +167,20 @@ public class VistaConsola {
 
 
     private void mostrarMatrizCasillas() {
+        System.out.println("\n MAPA DE CONTENEDORES ");
+        int columnas = 4;
+        int contador = 0;
+
+        for (Casilla casilla : inventario) {
+            String estado = (casilla.getIdUsuarioAsignado() == null) ? "[LIBRE]" : "[USADA]";
+
+            System.out.printf("%-15s", casilla.getIdCasilla() + " " + estado);
+
+            contador++;
+            if (contador % columnas == 0) {
+                System.out.println();
+            }
+        }
+        System.out.println("\n-----------------------------");
     }
 }
