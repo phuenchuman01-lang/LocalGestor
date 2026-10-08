@@ -11,11 +11,11 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        // 1. Crear listas en memoria (Simulación funcional para el Avance 01)
+        // 1. Crear listas en memoria
         List<Casilla> inventario = new ArrayList<>();
         List<RegistroHistorial> auditoria = new ArrayList<>();
 
-        // 2. Inyectar datos de prueba (Mocking)
+        // 2. Inyectar datos de prueba
         // Creamos 5 casillas base
         for (int i = 1; i <= 5; i++) {
             inventario.add(new Casilla("LAB-" + i));
