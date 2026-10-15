@@ -4,37 +4,38 @@ import Controlador.UserController;
 import Modelo.Casilla;
 import Modelo.Item;
 import Modelo.RegistroHistorial;
-import Vista.VistaConsola;
+import Modelo.RolUsuario;
+import Vista.VentanaLogin;
 
+import javax.swing.SwingUtilities;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        // 1. Crear listas en memoria
         List<Casilla> inventario = new ArrayList<>();
         List<RegistroHistorial> auditoria = new ArrayList<>();
 
-        // 2. Inyectar datos de prueba
-        // Creamos 5 casillas base
-        for (int i = 1; i <= 5; i++) {
+        // Inicializamos 10 casillas de laboratorio por defecto
+        for (int i = 1; i <= 10; i++) {
             inventario.add(new Casilla("LAB-" + i));
         }
 
-        // Asignamos la primera casilla a un usuario de prueba y le ponemos un objeto
+        // Datos iniciales de prueba
         inventario.get(0).setIdUsuarioAsignado("user01");
-        inventario.get(0).agregarItem(new Item("Microscopio", 1));
+        inventario.get(0).agregarItem(new Item("Microscopio Óptico", 1));
 
-        // 3. Inicializar Controladores
         AuthController auth = new AuthController();
-        // Registramos un usuario de prueba para la simulación
-        auth.registrarUsuario("user01", "Estudiante Prueba", Modelo.RolUsuario.USUARIO);
+        // Credenciales por defecto -> Admin: admin / admin123 | Usuario: user01 / 1234
+        auth.registrarUsuario("user01", "Estudiante Prueba", "1234", RolUsuario.USUARIO);
 
         AdminController adminCtrl = new AdminController(inventario, auditoria);
         UserController userCtrl = new UserController(inventario, auditoria);
 
-        // 4. Inicializar y lanzar la Vista
-        VistaConsola vista = new VistaConsola(auth, adminCtrl, userCtrl, inventario, auditoria);
-        vista.iniciar();
+        // Lanzamos la GUI en el Event Dispatch Thread (EDT)
+        SwingUtilities.invokeLater(() -> {
+            VentanaLogin login = new VentanaLogin(auth, adminCtrl, userCtrl);
+            login.mostrarVentana();
+        });
     }
 }

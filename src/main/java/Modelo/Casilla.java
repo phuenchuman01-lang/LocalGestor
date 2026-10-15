@@ -14,6 +14,19 @@ public class Casilla {
         this.items = new ArrayList<>();
     }
 
+    public boolean estaDisponible() {
+        return this.idUsuarioAsignado == null || this.idUsuarioAsignado.trim().isEmpty();
+    }
+
+    public void ocupar(String idUsuario) {
+        this.idUsuarioAsignado = idUsuario;
+    }
+
+    public void liberar() {
+        this.idUsuarioAsignado = null;
+        this.items.clear();
+    }
+
     public String getIdCasilla() {
         return idCasilla;
     }
