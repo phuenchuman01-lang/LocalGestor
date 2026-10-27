@@ -5,6 +5,7 @@ import Modelo.Casilla;
 import Modelo.Item;
 import Modelo.RegistroHistorial;
 import Modelo.RolUsuario;
+import Vista.TemaUI;
 import Vista.VentanaLogin;
 
 import javax.swing.SwingUtilities;
@@ -34,6 +35,10 @@ public class Main {
 
         // Lanzamos la GUI en el Event Dispatch Thread (EDT)
         SwingUtilities.invokeLater(() -> {
+            // 1. Aplicamos el tema global primero para pintar toda la interfaz
+            TemaUI.aplicarTemaGlobal();
+
+            // 2. Luego instanciamos las ventanas
             VentanaLogin login = new VentanaLogin(auth, adminCtrl, userCtrl);
             login.mostrarVentana();
         });

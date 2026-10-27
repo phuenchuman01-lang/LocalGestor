@@ -76,10 +76,17 @@ public class MenuDocente {
                     SwingConstants.CENTER
             );
 
+            // --- APLICACIÓN DE COLORES ELEGANTES Y CONTRASTANTES ---
             if (c.estaDisponible()) {
-                btnCasilla.setBackground(new Color(144, 238, 144));
+                btnCasilla.setBackground(new Color(40, 100, 60)); // Verde esmeralda oscuro
+                btnCasilla.setForeground(Color.WHITE);
+                lblId.setForeground(Color.WHITE);
+                lblEstado.setForeground(Color.WHITE);
             } else {
-                btnCasilla.setBackground(new Color(255, 182, 193));
+                btnCasilla.setBackground(new Color(120, 40, 50)); // Carmesí apagado
+                btnCasilla.setForeground(Color.WHITE);
+                lblId.setForeground(Color.WHITE);
+                lblEstado.setForeground(Color.WHITE);
             }
 
             btnCasilla.add(lblId, BorderLayout.NORTH);
