@@ -39,9 +39,13 @@ public class VentanaLogin {
         panelLogin.add(txtClave);
 
         JButton btnRegistrar = new JButton("Crear Usuario");
+        btnRegistrar.setOpaque(true);
+        btnRegistrar.setBackground(TemaUI.AZUL_OSCURO);
         panelLogin.add(btnRegistrar);
 
         JButton btnIngresar = new JButton("Ingresar");
+        btnIngresar.setOpaque(true);
+        btnIngresar.setBackground(TemaUI.AZUL_OSCURO);
         panelLogin.add(btnIngresar);
 
         frame.add(panelLogin);

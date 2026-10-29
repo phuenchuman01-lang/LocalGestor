@@ -39,6 +39,7 @@ public class MenuEstudiante {
         JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
 
         JButton btnBuscarItem = new JButton("Buscar Ubicación de un Objeto");
+        estilizarBoton(btnBuscarItem);
         btnBuscarItem.addActionListener(e -> {
             String nombre = JOptionPane.showInputDialog(frame, "Ingrese el nombre del objeto a localizar:");
             if (nombre != null && !nombre.trim().isEmpty()) {
@@ -48,6 +49,7 @@ public class MenuEstudiante {
         });
 
         JButton btnCerrarSesion = new JButton("Cerrar Sesión");
+        estilizarBoton(btnCerrarSesion);
         btnCerrarSesion.addActionListener(e -> {
             auth.cerrarSesion();
             frame.dispose();
@@ -61,6 +63,13 @@ public class MenuEstudiante {
         cargarOpcionesCasilla();
     }
 
+    // --- MÉTODO AUXILIAR PARA INYECTAR LA ESTÉTICA DEL LOGIN ---
+    private void estilizarBoton(JButton btn) {
+        btn.setOpaque(true);
+        btn.setBackground(TemaUI.AZUL_OSCURO);
+        btn.setForeground(TemaUI.TEXTO_CLARO);
+    }
+
     private void cargarOpcionesCasilla() {
         panelCentro.removeAll();
         String miId = auth.getUsuarioActual().getIdUsuario();
@@ -69,11 +78,13 @@ public class MenuEstudiante {
         if (miCasilla == null) {
             JButton btnRegistrar = new JButton("Reclamar Casilla Disponible");
             btnRegistrar.setFont(new Font("Arial", Font.BOLD, 16));
+            estilizarBoton(btnRegistrar);
             btnRegistrar.addActionListener(e -> mostrarVentanaReclamo());
             panelCentro.add(btnRegistrar);
         } else {
             JButton btnAdministrar = new JButton("Administrar Mi Casilla (" + miCasilla.getIdCasilla() + ")");
             btnAdministrar.setFont(new Font("Arial", Font.BOLD, 16));
+            estilizarBoton(btnAdministrar);
             btnAdministrar.addActionListener(e -> mostrarVentanaAdministracion(miCasilla));
             panelCentro.add(btnAdministrar);
         }
@@ -131,9 +142,13 @@ public class MenuEstudiante {
 
         JPanel panelBotones = new JPanel(new GridLayout(2, 2, 5, 5));
         JButton btnAgregar = new JButton("Guardar Objeto");
+        estilizarBoton(btnAgregar);
         JButton btnQuitar = new JButton("Retirar Objeto");
+        estilizarBoton(btnQuitar);
         JButton btnLiberar = new JButton("Liberar Casilla");
+        estilizarBoton(btnLiberar);
         JButton btnCerrar = new JButton("Cerrar");
+        estilizarBoton(btnCerrar);
 
         btnAgregar.addActionListener(e -> {
             JTextField txtNombre = new JTextField();

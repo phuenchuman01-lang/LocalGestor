@@ -43,9 +43,13 @@ public class VentanaRegistro {
         panel.add(txtClave);
 
         JButton btnVolver = new JButton("Volver");
+        btnVolver.setOpaque(true);
+        btnVolver.setBackground(TemaUI.AZUL_OSCURO);
         panel.add(btnVolver);
 
         JButton btnRegistrar = new JButton("Registrar");
+        btnRegistrar.setOpaque(true);
+        btnRegistrar.setBackground(TemaUI.AZUL_OSCURO);
         panel.add(btnRegistrar);
 
         frame.add(panel);

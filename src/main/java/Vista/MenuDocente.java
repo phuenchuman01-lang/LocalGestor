@@ -34,17 +34,23 @@ public class MenuDocente {
 
         panelCasillas = new JPanel(new GridLayout(0, 5, 10, 10));
         panelCasillas.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-        frame.add(new JScrollPane(panelCasillas), BorderLayout.CENTER);
+
+        JScrollPane scrollMatrix = new JScrollPane(panelCasillas);
+        scrollMatrix.setBorder(BorderFactory.createEmptyBorder());
+        frame.add(scrollMatrix, BorderLayout.CENTER);
 
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
 
         JButton btnAgregarModulo = new JButton("Agregar Módulo de Casillas");
+        estilizarBoton(btnAgregarModulo);
         btnAgregarModulo.addActionListener(e -> dialogAgregarModulo());
 
         JButton btnVerHistorial = new JButton("Ver Historial de Auditoría");
+        estilizarBoton(btnVerHistorial);
         btnVerHistorial.addActionListener(e -> mostrarVentanaHistorial());
 
         JButton btnCerrarSesion = new JButton("Cerrar Sesión");
+        estilizarBoton(btnCerrarSesion);
         btnCerrarSesion.addActionListener(e -> {
             auth.cerrarSesion();
             frame.dispose();
@@ -59,6 +65,13 @@ public class MenuDocente {
         cargarVistaCasillas();
     }
 
+    // --- MÉTODO AUXILIAR PARA INYECTAR LA ESTÉTICA DEL LOGIN ---
+    private void estilizarBoton(JButton btn) {
+        btn.setOpaque(true);
+        btn.setBackground(TemaUI.AZUL_OSCURO);
+        btn.setForeground(TemaUI.TEXTO_CLARO);
+    }
+
     private void cargarVistaCasillas() {
         panelCasillas.removeAll();
         List<Casilla> casillas = adminCtrl.obtenerTodasLasCasillas();
@@ -67,6 +80,7 @@ public class MenuDocente {
             JButton btnCasilla = new JButton();
             btnCasilla.setLayout(new BorderLayout());
             btnCasilla.setPreferredSize(new Dimension(130, 90));
+            btnCasilla.setOpaque(true);
 
             JLabel lblId = new JLabel(c.getIdCasilla(), SwingConstants.CENTER);
             lblId.setFont(new Font("Arial", Font.BOLD, 14));
@@ -76,14 +90,13 @@ public class MenuDocente {
                     SwingConstants.CENTER
             );
 
-            // --- APLICACIÓN DE COLORES ELEGANTES Y CONTRASTANTES ---
             if (c.estaDisponible()) {
-                btnCasilla.setBackground(new Color(40, 100, 60)); // Verde esmeralda oscuro
+                btnCasilla.setBackground(new Color(40, 100, 60));
                 btnCasilla.setForeground(Color.WHITE);
                 lblId.setForeground(Color.WHITE);
                 lblEstado.setForeground(Color.WHITE);
             } else {
-                btnCasilla.setBackground(new Color(120, 40, 50)); // Carmesí apagado
+                btnCasilla.setBackground(new Color(120, 40, 50));
                 btnCasilla.setForeground(Color.WHITE);
                 lblId.setForeground(Color.WHITE);
                 lblEstado.setForeground(Color.WHITE);
@@ -139,7 +152,9 @@ public class MenuDocente {
 
             JPanel panelBotones = new JPanel();
             JButton btnAsignar = new JButton("Asignar a Usuario");
+            estilizarBoton(btnAsignar);
             JButton btnCerrar = new JButton("Cerrar");
+            estilizarBoton(btnCerrar);
 
             btnAsignar.addActionListener(e -> {
                 String idUsuario = JOptionPane.showInputDialog(dialog, "Ingrese el ID del usuario a asignar:");
@@ -174,10 +189,15 @@ public class MenuDocente {
 
             JPanel panelBotones = new JPanel(new GridLayout(3, 2, 5, 5));
             JButton btnAgregar = new JButton("Agregar Item");
+            estilizarBoton(btnAgregar);
             JButton btnQuitar = new JButton("Retirar Item");
+            estilizarBoton(btnQuitar);
             JButton btnLiberar = new JButton("Liberar Casilla");
+            estilizarBoton(btnLiberar);
             JButton btnMover = new JButton("Mover Contenido");
+            estilizarBoton(btnMover);
             JButton btnCerrar = new JButton("Cerrar");
+            estilizarBoton(btnCerrar);
 
             btnAgregar.addActionListener(e -> {
                 JTextField txtNombre = new JTextField();
