@@ -16,7 +16,7 @@ public class Item {
     public Item(String idItem, String nombre, int cantidad) {
         this.idItem = idItem;
         this.nombre = nombre;
-        this.cantidad = cantidad;
+        setCantidad(cantidad);
     }
 
     public String getIdItem() {
@@ -37,5 +37,10 @@ public class Item {
 
     public void setCantidad(int cantidad) {
         this.cantidad = Math.max(0, cantidad);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (Cant: %d) [ID: %s]", nombre, cantidad, idItem.substring(0, Math.min(6, idItem.length())));
     }
 }

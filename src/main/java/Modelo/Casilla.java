@@ -14,25 +14,28 @@ public class Casilla {
         this.items = new ArrayList<>();
     }
 
-    public String getIdCasilla() {
-        return idCasilla;
+    public boolean estaDisponible() {
+        return this.idUsuarioAsignado == null || this.idUsuarioAsignado.isBlank();
     }
 
-    public String getIdUsuarioAsignado() {
-        return idUsuarioAsignado;
+    public void ocupar(String idUsuario) {
+        this.idUsuarioAsignado = idUsuario;
     }
 
-    public void setIdUsuarioAsignado(String idUsuarioAsignado) {
-        this.idUsuarioAsignado = idUsuarioAsignado;
+    public void liberar() {
+        this.idUsuarioAsignado = null;
     }
 
-    public List<Item> getItems() {
-        return items;
+    public void vaciarContenido() {
+        this.items.clear();
     }
 
-    public void agregarItem(Item item) {
-        this.items.add(item);
-    }
+    public String getIdCasilla() { return idCasilla; }
+    public String getIdUsuarioAsignado() { return idUsuarioAsignado; }
+    public void setIdUsuarioAsignado(String idUsuarioAsignado) { this.idUsuarioAsignado = idUsuarioAsignado; }
+    public List<Item> getItems() { return items; }
+
+    public void agregarItem(Item item) { this.items.add(item); }
 
     public boolean removerItem(String idItem) {
         return this.items.removeIf(item -> item.getIdItem().equals(idItem));
