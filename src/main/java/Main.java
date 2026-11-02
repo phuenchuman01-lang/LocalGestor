@@ -5,8 +5,8 @@ import Modelo.Casilla;
 import Modelo.Item;
 import Modelo.RegistroHistorial;
 import Modelo.RolUsuario;
+import Vista.AppRouter;
 import Vista.TemaUI;
-import Vista.VentanaLogin;
 
 import javax.swing.SwingUtilities;
 import java.util.ArrayList;
@@ -14,33 +14,28 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        // 1. Datos (Podría ir en una clase DataSeeder)
         List<Casilla> inventario = new ArrayList<>();
         List<RegistroHistorial> auditoria = new ArrayList<>();
 
-        // Inicializamos 10 casillas de laboratorio por defecto
-        for (int i = 1; i <= 10; i++) {
-            inventario.add(new Casilla("LAB-" + i));
-        }
-
-        // Datos iniciales de prueba
+        for (int i = 1; i <= 10; i++) inventario.add(new Casilla("LAB-" + i));
         inventario.get(0).setIdUsuarioAsignado("user01");
         inventario.get(0).agregarItem(new Item("Microscopio Óptico", 1));
 
+        // 2. Controladores
         AuthController auth = new AuthController();
-        // Credenciales por defecto -> Admin: admin / admin123 | Usuario: user01 / 1234
         auth.registrarUsuario("user01", "Estudiante Prueba", "1234", RolUsuario.USUARIO);
 
         AdminController adminCtrl = new AdminController(inventario, auditoria);
         UserController userCtrl = new UserController(inventario, auditoria);
 
-        // Lanzamos la GUI en el Event Dispatch Thread (EDT)
-        SwingUtilities.invokeLater(() -> {
-            // 1. Aplicamos el tema global primero para pintar toda la interfaz
-            TemaUI.aplicarTemaGlobal();
+        // 3. Router
+        AppRouter router = new AppRouter(auth, adminCtrl, userCtrl);
 
-            // 2. Luego instanciamos las ventanas
-            VentanaLogin login = new VentanaLogin(auth, adminCtrl, userCtrl);
-            login.mostrarVentana();
+        // 4. Ejecución en EDT
+        SwingUtilities.invokeLater(() -> {
+            TemaUI.aplicarTemaGlobal();
+            router.irAlLogin();
         });
     }
 }

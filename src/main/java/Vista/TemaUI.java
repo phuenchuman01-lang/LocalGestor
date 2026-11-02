@@ -15,19 +15,19 @@ public class TemaUI {
     public static void aplicarTemaGlobal() {
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            UIManager.put("swing.boldMetal", Boolean.FALSE);
 
             UIManager.put("Panel.background", new ColorUIResource(FONDO_PRINCIPAL));
             UIManager.put("OptionPane.background", new ColorUIResource(FONDO_PRINCIPAL));
             UIManager.put("OptionPane.messageForeground", new ColorUIResource(TEXTO_CLARO));
             UIManager.put("Label.foreground", new ColorUIResource(TEXTO_CLARO));
 
-            // Botones: Eliminando el degradado nativo y forzando color sólido
+            UIManager.put("Button.gradient", null);
+            UIManager.put("Button.rollover", Boolean.FALSE);
+            UIManager.put("Button.select", new ColorUIResource(AZUL_OSCURO.darker()));
             UIManager.put("Button.background", new ColorUIResource(AZUL_OSCURO));
             UIManager.put("Button.foreground", new ColorUIResource(TEXTO_CLARO));
             UIManager.put("Button.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
-            UIManager.put("Button.contentAreaFilled", false); // Clave para quitar el degradado
-            UIManager.put("Button.setOpaque", true);
-
             UIManager.put("Button.border", BorderFactory.createCompoundBorder(
                     new LineBorder(AZUL_CLARO_BORDE, 1),
                     BorderFactory.createEmptyBorder(5, 15, 5, 15)
@@ -51,13 +51,19 @@ public class TemaUI {
 
             UIManager.put("List.background", new ColorUIResource(FONDO_INPUT));
             UIManager.put("List.foreground", new ColorUIResource(TEXTO_CLARO));
-            UIManager.put("TextArea.background", new ColorUIResource(FONDO_INPUT));
-            UIManager.put("TextArea.foreground", new ColorUIResource(TEXTO_CLARO));
             UIManager.put("ScrollPane.background", new ColorUIResource(FONDO_PRINCIPAL));
             UIManager.put("ScrollPane.border", new LineBorder(AZUL_CLARO_BORDE, 1));
-
         } catch (Exception e) {
             System.err.println("Error al aplicar TemaUI: " + e.getMessage());
         }
+    }
+
+    // NUEVO: Método centralizado para botones
+    public static void estilizarBoton(JButton btn) {
+        btn.setOpaque(true);
+        btn.setBackground(AZUL_OSCURO);
+        btn.setForeground(TEXTO_CLARO);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 }

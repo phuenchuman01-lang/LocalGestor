@@ -1,26 +1,16 @@
 package Vista;
 
-import Controlador.AdminController;
-import Controlador.AuthController;
-import Controlador.UserController;
-import Modelo.RolUsuario;
-
 import javax.swing.*;
 import java.awt.*;
 
 public class VentanaLogin {
     private final JFrame frame;
-    private final AuthController auth;
-    private final AdminController adminCtrl;
-    private final UserController userCtrl;
-
+    private final AppRouter router;
     private final JTextField txtUsuario;
     private final JPasswordField txtClave;
 
-    public VentanaLogin(AuthController auth, AdminController adminCtrl, UserController userCtrl) {
-        this.auth = auth;
-        this.adminCtrl = adminCtrl;
-        this.userCtrl = userCtrl;
+    public VentanaLogin(AppRouter router) {
+        this.router = router;
 
         frame = new JFrame("LocalGestor - Inicio de Sesión");
         frame.setSize(450, 320);
@@ -39,13 +29,11 @@ public class VentanaLogin {
         panelLogin.add(txtClave);
 
         JButton btnRegistrar = new JButton("Crear Usuario");
-        btnRegistrar.setOpaque(true);
-        btnRegistrar.setBackground(TemaUI.AZUL_OSCURO);
+        TemaUI.estilizarBoton(btnRegistrar);
         panelLogin.add(btnRegistrar);
 
         JButton btnIngresar = new JButton("Ingresar");
-        btnIngresar.setOpaque(true);
-        btnIngresar.setBackground(TemaUI.AZUL_OSCURO);
+        TemaUI.estilizarBoton(btnIngresar);
         panelLogin.add(btnIngresar);
 
         frame.add(panelLogin);
@@ -53,7 +41,7 @@ public class VentanaLogin {
         btnIngresar.addActionListener(e -> intentarLogin());
         btnRegistrar.addActionListener(e -> {
             frame.dispose();
-            new VentanaRegistro(auth, adminCtrl, userCtrl).mostrarVentana();
+            router.irAlRegistro();
         });
     }
 
@@ -66,17 +54,11 @@ public class VentanaLogin {
         String user = txtUsuario.getText();
         String password = new String(txtClave.getPassword());
 
-        try {
-            auth.iniciarSesion(user, password);
+        if (router.getAuth().iniciarSesion(user, password)) {
             frame.dispose();
-
-            if (auth.getUsuarioActual().getRol() == RolUsuario.ADMIN) {
-                new MenuDocente(auth, adminCtrl, userCtrl).mostrarVentana();
-            } else {
-                new MenuEstudiante(auth, adminCtrl, userCtrl).mostrarVentana();
-            }
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(frame, ex.getMessage(), "Error de Acceso", JOptionPane.ERROR_MESSAGE);
+            router.irAlMenuPrincipal();
+        } else {
+            DialogoUI.mostrarMensaje(frame, "Usuario o contraseña incorrectos.", "Error de Acceso", JOptionPane.ERROR_MESSAGE);
             txtClave.setText("");
         }
     }

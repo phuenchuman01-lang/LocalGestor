@@ -15,7 +15,7 @@ public class Casilla {
     }
 
     public boolean estaDisponible() {
-        return this.idUsuarioAsignado == null || this.idUsuarioAsignado.trim().isEmpty();
+        return this.idUsuarioAsignado == null || this.idUsuarioAsignado.isBlank();
     }
 
     public void ocupar(String idUsuario) {
@@ -24,28 +24,18 @@ public class Casilla {
 
     public void liberar() {
         this.idUsuarioAsignado = null;
+    }
+
+    public void vaciarContenido() {
         this.items.clear();
     }
 
-    public String getIdCasilla() {
-        return idCasilla;
-    }
+    public String getIdCasilla() { return idCasilla; }
+    public String getIdUsuarioAsignado() { return idUsuarioAsignado; }
+    public void setIdUsuarioAsignado(String idUsuarioAsignado) { this.idUsuarioAsignado = idUsuarioAsignado; }
+    public List<Item> getItems() { return items; }
 
-    public String getIdUsuarioAsignado() {
-        return idUsuarioAsignado;
-    }
-
-    public void setIdUsuarioAsignado(String idUsuarioAsignado) {
-        this.idUsuarioAsignado = idUsuarioAsignado;
-    }
-
-    public List<Item> getItems() {
-        return items;
-    }
-
-    public void agregarItem(Item item) {
-        this.items.add(item);
-    }
+    public void agregarItem(Item item) { this.items.add(item); }
 
     public boolean removerItem(String idItem) {
         return this.items.removeIf(item -> item.getIdItem().equals(idItem));

@@ -5,6 +5,7 @@ import Modelo.Item;
 import Modelo.RegistroHistorial;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class UserController {
     private final List<Casilla> inventarioCasillas;
@@ -16,23 +17,23 @@ public class UserController {
     }
 
     public boolean guardarItem(String idCasilla, Item item, String idUsuario) {
-        for (Casilla casilla : inventarioCasillas) {
-            if (casilla.getIdCasilla().equalsIgnoreCase(idCasilla) && idUsuario.equals(casilla.getIdUsuarioAsignado())) {
-                casilla.agregarItem(item);
-                registrarAccion(idUsuario, "INGRESO_ITEM", "Agregó " + item.getNombre() + " (x" + item.getCantidad() + ") en " + idCasilla);
-                return true;
-            }
+        Optional<Casilla> casillaOpt = inventarioCasillas.stream()
+                .filter(c -> c.getIdCasilla().equalsIgnoreCase(idCasilla) && idUsuario.equals(c.getIdUsuarioAsignado()))
+                .findFirst();
+
+        if (casillaOpt.isPresent()) {
+            casillaOpt.get().agregarItem(item);
+            registrarAccion(idUsuario, "INGRESO_ITEM", "Agregó " + item.getNombre() + " en " + idCasilla);
+            return true;
         }
         return false;
     }
 
     public boolean retirarItem(String idCasilla, String idItem, String idUsuario) {
-        for (Casilla casilla : inventarioCasillas) {
-            if (casilla.getIdCasilla().equalsIgnoreCase(idCasilla) && idUsuario.equals(casilla.getIdUsuarioAsignado())) {
-                boolean removido = casilla.removerItem(idItem);
-                if (removido) {
-                    registrarAccion(idUsuario, "RETIRO_ITEM", "Retiró item ID: " + idItem + " de " + idCasilla);
-                }
+        for (Casilla c : inventarioCasillas) {
+            if (c.getIdCasilla().equalsIgnoreCase(idCasilla) && idUsuario.equals(c.getIdUsuarioAsignado())) {
+                boolean removido = c.removerItem(idItem);
+                if (removido) registrarAccion(idUsuario, "RETIRO_ITEM", "Retiró item de " + idCasilla);
                 return removido;
             }
         }
@@ -40,23 +41,21 @@ public class UserController {
     }
 
     public String buscarUbicacionItem(String nombreItem) {
-        for (Casilla casilla : inventarioCasillas) {
-            for (Item item : casilla.getItems()) {
+        for (Casilla c : inventarioCasillas) {
+            for (Item item : c.getItems()) {
                 if (item.getNombre().equalsIgnoreCase(nombreItem)) {
-                    return "El objeto '" + nombreItem + "' se encuentra en la casilla: " + casilla.getIdCasilla();
+                    return "El objeto '" + nombreItem + "' está en la casilla: " + c.getIdCasilla();
                 }
             }
         }
-        return "Objeto no encontrado en el sistema.";
+        return "Objeto no encontrado.";
     }
 
     public Casilla buscarCasillaPorUsuario(String idUsuario) {
-        for (Casilla c : inventarioCasillas) {
-            if (idUsuario.equals(c.getIdUsuarioAsignado())) {
-                return c;
-            }
-        }
-        return null;
+        return inventarioCasillas.stream()
+                .filter(c -> idUsuario.equals(c.getIdUsuarioAsignado()))
+                .findFirst()
+                .orElse(null);
     }
 
     public void reclamarCasilla(String idCasilla, String idUsuario) {
@@ -65,26 +64,25 @@ public class UserController {
         }
         for (Casilla c : inventarioCasillas) {
             if (c.getIdCasilla().equalsIgnoreCase(idCasilla)) {
-                if (!c.estaDisponible()) {
-                    throw new IllegalStateException("La casilla " + idCasilla + " ya está ocupada.");
-                }
+                if (!c.estaDisponible()) throw new IllegalStateException("Casilla ocupada.");
                 c.ocupar(idUsuario);
-                registrarAccion(idUsuario, "AUTO_ASIGNACION", "Registró y ocupó la casilla " + idCasilla);
+                registrarAccion(idUsuario, "AUTO_ASIGNACION", "Ocupó la casilla " + idCasilla);
                 return;
             }
         }
-        throw new IllegalArgumentException("La casilla " + idCasilla + " no fue encontrada.");
+        throw new IllegalArgumentException("Casilla no encontrada.");
     }
 
     public void liberarMiCasilla(String idCasilla, String idUsuario) {
         for (Casilla c : inventarioCasillas) {
             if (c.getIdCasilla().equalsIgnoreCase(idCasilla) && idUsuario.equals(c.getIdUsuarioAsignado())) {
                 c.liberar();
-                registrarAccion(idUsuario, "LIBERACION_USUARIO", "Liberó su casilla " + idCasilla);
+                c.vaciarContenido(); // Vaciamos al liberar por parte del usuario
+                registrarAccion(idUsuario, "LIBERACION_USUARIO", "Liberó casilla " + idCasilla);
                 return;
             }
         }
-        throw new IllegalArgumentException("No tienes permisos sobre esta casilla o no existe.");
+        throw new IllegalArgumentException("No tienes permisos sobre esta casilla.");
     }
 
     public List<Casilla> obtenerTodasLasCasillas() {

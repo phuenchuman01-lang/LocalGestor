@@ -1,8 +1,5 @@
 package Vista;
 
-import Controlador.AdminController;
-import Controlador.AuthController;
-import Controlador.UserController;
 import Modelo.Casilla;
 import Modelo.Item;
 
@@ -13,22 +10,18 @@ import java.util.List;
 
 public class MenuEstudiante {
     private final JFrame frame = new JFrame("Panel de Usuario - LocalGestor");
-    private final AuthController auth;
-    private final AdminController adminCtrl;
-    private final UserController userCtrl;
+    private final AppRouter router;
     private final JPanel panelCentro;
 
-    public MenuEstudiante(AuthController auth, AdminController adminCtrl, UserController userCtrl) {
-        this.auth = auth;
-        this.adminCtrl = adminCtrl;
-        this.userCtrl = userCtrl;
+    public MenuEstudiante(AppRouter router) {
+        this.router = router;
 
         frame.setSize(600, 420);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout(10, 10));
 
-        JLabel titulo = new JLabel("Bienvenido: " + auth.getUsuarioActual().getNombre()
-                + " (" + auth.getUsuarioActual().getIdUsuario() + ")", SwingConstants.CENTER);
+        JLabel titulo = new JLabel("Bienvenido: " + router.getAuth().getUsuarioActual().getNombre()
+                + " (" + router.getAuth().getUsuarioActual().getIdUsuario() + ")", SwingConstants.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 18));
         titulo.setBorder(BorderFactory.createEmptyBorder(15, 10, 10, 10));
         frame.add(titulo, BorderLayout.NORTH);
@@ -39,21 +32,22 @@ public class MenuEstudiante {
         JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
 
         JButton btnBuscarItem = new JButton("Buscar Ubicación de un Objeto");
-        estilizarBoton(btnBuscarItem);
+        TemaUI.estilizarBoton(btnBuscarItem);
         btnBuscarItem.addActionListener(e -> {
-            String nombre = JOptionPane.showInputDialog(frame, "Ingrese el nombre del objeto a localizar:");
+            // Usamos DialogoUI
+            String nombre = DialogoUI.mostrarInput(frame, "Ingrese el nombre del objeto a localizar:", "Búsqueda en Laboratorio");
             if (nombre != null && !nombre.trim().isEmpty()) {
-                String resultado = userCtrl.buscarUbicacionItem(nombre.trim());
-                JOptionPane.showMessageDialog(frame, resultado, "Búsqueda en Laboratorio", JOptionPane.INFORMATION_MESSAGE);
+                String resultado = router.getUserCtrl().buscarUbicacionItem(nombre.trim());
+                DialogoUI.mostrarMensaje(frame, resultado, "Búsqueda en Laboratorio", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
         JButton btnCerrarSesion = new JButton("Cerrar Sesión");
-        estilizarBoton(btnCerrarSesion);
+        TemaUI.estilizarBoton(btnCerrarSesion);
         btnCerrarSesion.addActionListener(e -> {
-            auth.cerrarSesion();
+            router.getAuth().cerrarSesion();
             frame.dispose();
-            new VentanaLogin(auth, adminCtrl, userCtrl).mostrarVentana();
+            router.irAlLogin();
         });
 
         panelSur.add(btnBuscarItem);
@@ -63,71 +57,62 @@ public class MenuEstudiante {
         cargarOpcionesCasilla();
     }
 
-    // --- MÉTODO AUXILIAR PARA INYECTAR LA ESTÉTICA DEL LOGIN ---
-    private void estilizarBoton(JButton btn) {
-        btn.setOpaque(true);
-        btn.setBackground(TemaUI.AZUL_OSCURO);
-        btn.setForeground(TemaUI.TEXTO_CLARO);
-    }
-
     private void cargarOpcionesCasilla() {
         panelCentro.removeAll();
-        String miId = auth.getUsuarioActual().getIdUsuario();
-        Casilla miCasilla = userCtrl.buscarCasillaPorUsuario(miId);
+        String miId = router.getAuth().getUsuarioActual().getIdUsuario();
+        Casilla miCasilla = router.getUserCtrl().buscarCasillaPorUsuario(miId);
 
         if (miCasilla == null) {
             JButton btnRegistrar = new JButton("Reclamar Casilla Disponible");
             btnRegistrar.setFont(new Font("Arial", Font.BOLD, 16));
-            estilizarBoton(btnRegistrar);
+            TemaUI.estilizarBoton(btnRegistrar);
             btnRegistrar.addActionListener(e -> mostrarVentanaReclamo());
             panelCentro.add(btnRegistrar);
         } else {
             JButton btnAdministrar = new JButton("Administrar Mi Casilla (" + miCasilla.getIdCasilla() + ")");
             btnAdministrar.setFont(new Font("Arial", Font.BOLD, 16));
-            estilizarBoton(btnAdministrar);
+            TemaUI.estilizarBoton(btnAdministrar);
             btnAdministrar.addActionListener(e -> mostrarVentanaAdministracion(miCasilla));
             panelCentro.add(btnAdministrar);
         }
-
         panelCentro.revalidate();
         panelCentro.repaint();
     }
 
     private void mostrarVentanaReclamo() {
         List<String> opciones = new ArrayList<>();
-        for (Casilla c : userCtrl.obtenerTodasLasCasillas()) {
+        for (Casilla c : router.getUserCtrl().obtenerTodasLasCasillas()) {
             opciones.add(c.getIdCasilla() + (c.estaDisponible() ? " - DISPONIBLE" : " - OCUPADA"));
         }
 
         if (opciones.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "No hay casillas creadas en el sistema.");
+            DialogoUI.mostrarMensaje(frame, "No hay casillas creadas en el sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        String seleccion = (String) JOptionPane.showInputDialog(
-                frame, "Selecciona una casilla disponible:\n\n",
-                "Inventario de Casillas", JOptionPane.PLAIN_MESSAGE, null,
-                opciones.toArray(), opciones.get(0)
+        // Usamos DialogoUI.mostrarCombo
+        String seleccion = DialogoUI.mostrarCombo(
+                frame, "Selecciona una casilla disponible:", "Inventario de Casillas", opciones.toArray()
         );
 
         if (seleccion != null) {
             if (seleccion.contains("OCUPADA")) {
-                JOptionPane.showMessageDialog(frame, "Esa casilla ya se encuentra ocupada.", "Error", JOptionPane.ERROR_MESSAGE);
+                DialogoUI.mostrarMensaje(frame, "Esa casilla ya se encuentra ocupada.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 String idCasilla = seleccion.split(" - ")[0].trim();
                 try {
-                    userCtrl.reclamarCasilla(idCasilla, auth.getUsuarioActual().getIdUsuario());
-                    JOptionPane.showMessageDialog(frame, "¡Casilla " + idCasilla + " asignada a tu cuenta!");
+                    router.getUserCtrl().reclamarCasilla(idCasilla, router.getAuth().getUsuarioActual().getIdUsuario());
+                    DialogoUI.mostrarMensaje(frame, "¡Casilla " + idCasilla + " asignada a tu cuenta!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                     cargarOpcionesCasilla();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(frame, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    DialogoUI.mostrarMensaje(frame, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
     }
 
     private void mostrarVentanaAdministracion(Casilla casilla) {
-        String miId = auth.getUsuarioActual().getIdUsuario();
+        String miId = router.getAuth().getUsuarioActual().getIdUsuario();
         JDialog dialog = new JDialog(frame, "Administrando Casilla " + casilla.getIdCasilla(), true);
         dialog.setSize(420, 320);
         dialog.setLayout(new BorderLayout());
@@ -142,31 +127,33 @@ public class MenuEstudiante {
 
         JPanel panelBotones = new JPanel(new GridLayout(2, 2, 5, 5));
         JButton btnAgregar = new JButton("Guardar Objeto");
-        estilizarBoton(btnAgregar);
+        TemaUI.estilizarBoton(btnAgregar);
         JButton btnQuitar = new JButton("Retirar Objeto");
-        estilizarBoton(btnQuitar);
+        TemaUI.estilizarBoton(btnQuitar);
         JButton btnLiberar = new JButton("Liberar Casilla");
-        estilizarBoton(btnLiberar);
+        TemaUI.estilizarBoton(btnLiberar);
         JButton btnCerrar = new JButton("Cerrar");
-        estilizarBoton(btnCerrar);
+        TemaUI.estilizarBoton(btnCerrar);
 
         btnAgregar.addActionListener(e -> {
             JTextField txtNombre = new JTextField();
             JTextField txtCantidad = new JTextField("1");
             Object[] campos = {"Nombre del objeto:", txtNombre, "Cantidad:", txtCantidad};
 
+            // El JOptionPane con formulario es el único que se nos resiste un poco,
+            // pero lo mantenemos aquí y le aplicamos un ajuste rápido.
             if (JOptionPane.showConfirmDialog(dialog, campos, "Guardar Objeto", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                 try {
                     String nombre = txtNombre.getText().trim();
                     int cant = Integer.parseInt(txtCantidad.getText().trim());
                     if (!nombre.isEmpty()) {
                         Item nuevoItem = new Item(nombre, cant);
-                        if (userCtrl.guardarItem(casilla.getIdCasilla(), nuevoItem, miId)) {
+                        if (router.getUserCtrl().guardarItem(casilla.getIdCasilla(), nuevoItem, miId)) {
                             modeloLista.addElement(nuevoItem);
                         }
                     }
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(dialog, "Ingrese una cantidad numérica válida.", "Error", JOptionPane.ERROR_MESSAGE);
+                    DialogoUI.mostrarMensaje(dialog, "Ingrese una cantidad numérica válida.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -174,20 +161,18 @@ public class MenuEstudiante {
         btnQuitar.addActionListener(e -> {
             Item seleccionado = listaItems.getSelectedValue();
             if (seleccionado != null) {
-                if (userCtrl.retirarItem(casilla.getIdCasilla(), seleccionado.getIdItem(), miId)) {
+                if (router.getUserCtrl().retirarItem(casilla.getIdCasilla(), seleccionado.getIdItem(), miId)) {
                     modeloLista.removeElement(seleccionado);
                 }
             } else {
-                JOptionPane.showMessageDialog(dialog, "Selecciona un objeto de la lista primero.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                DialogoUI.mostrarMensaje(dialog, "Selecciona un objeto de la lista primero.", "Aviso", JOptionPane.WARNING_MESSAGE);
             }
         });
 
         btnLiberar.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(dialog,
-                    "¿Seguro que deseas liberar esta casilla?\nTodos los objetos serán retirados.",
-                    "Confirmar Liberación", JOptionPane.YES_NO_OPTION);
+            int confirm = DialogoUI.mostrarConfirmacion(dialog, "¿Seguro que deseas liberar esta casilla?\nTodos los objetos serán retirados.", "Confirmar Liberación", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                userCtrl.liberarMiCasilla(casilla.getIdCasilla(), miId);
+                router.getUserCtrl().liberarMiCasilla(casilla.getIdCasilla(), miId);
                 dialog.dispose();
                 cargarOpcionesCasilla();
             }

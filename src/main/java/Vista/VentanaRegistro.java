@@ -1,8 +1,5 @@
 package Vista;
 
-import Controlador.AdminController;
-import Controlador.AuthController;
-import Controlador.UserController;
 import Modelo.RolUsuario;
 
 import javax.swing.*;
@@ -10,18 +7,13 @@ import java.awt.*;
 
 public class VentanaRegistro {
     private final JFrame frame;
-    private final AuthController auth;
-    private final AdminController adminCtrl;
-    private final UserController userCtrl;
-
+    private final AppRouter router;
     private final JTextField txtIdUsuario;
     private final JTextField txtNombre;
     private final JPasswordField txtClave;
 
-    public VentanaRegistro(AuthController auth, AdminController adminCtrl, UserController userCtrl) {
-        this.auth = auth;
-        this.adminCtrl = adminCtrl;
-        this.userCtrl = userCtrl;
+    public VentanaRegistro(AppRouter router) {
+        this.router = router;
 
         frame = new JFrame("LocalGestor - Registro de Usuario");
         frame.setSize(420, 300);
@@ -43,18 +35,20 @@ public class VentanaRegistro {
         panel.add(txtClave);
 
         JButton btnVolver = new JButton("Volver");
-        btnVolver.setOpaque(true);
-        btnVolver.setBackground(TemaUI.AZUL_OSCURO);
+        TemaUI.estilizarBoton(btnVolver);
         panel.add(btnVolver);
 
         JButton btnRegistrar = new JButton("Registrar");
-        btnRegistrar.setOpaque(true);
-        btnRegistrar.setBackground(TemaUI.AZUL_OSCURO);
+        TemaUI.estilizarBoton(btnRegistrar);
         panel.add(btnRegistrar);
 
         frame.add(panel);
 
-        btnVolver.addActionListener(e -> volverAlLogin());
+        btnVolver.addActionListener(e -> {
+            frame.dispose();
+            router.irAlLogin();
+        });
+
         btnRegistrar.addActionListener(e -> intentarRegistro());
     }
 
@@ -63,20 +57,16 @@ public class VentanaRegistro {
         frame.setVisible(true);
     }
 
-    private void volverAlLogin() {
-        frame.dispose();
-        new VentanaLogin(auth, adminCtrl, userCtrl).mostrarVentana();
-    }
-
     private void intentarRegistro() {
         try {
             String id = txtIdUsuario.getText();
             String nombre = txtNombre.getText();
             String pass = new String(txtClave.getPassword());
 
-            auth.registrarUsuario(id, nombre, pass, RolUsuario.USUARIO);
+            router.getAuth().registrarUsuario(id, nombre, pass, RolUsuario.USUARIO);
             JOptionPane.showMessageDialog(frame, "¡Usuario registrado exitosamente!");
-            volverAlLogin();
+            frame.dispose();
+            router.irAlLogin();
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(frame, ex.getMessage(), "Error de Registro", JOptionPane.ERROR_MESSAGE);
         }

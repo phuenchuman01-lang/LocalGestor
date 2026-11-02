@@ -11,33 +11,20 @@ public class AuthController {
 
     public AuthController() {
         this.usuarios = new HashMap<>();
+        // Admin por defecto
         this.usuarios.put("admin", new Usuario("admin", "Administrador Principal", "admin123", RolUsuario.ADMIN));
     }
 
-    // Conservado para compatibilidad con VistaConsola y AuthControllerTest
-    public boolean iniciarSesion(String idUsuario) {
-        if (usuarios.containsKey(idUsuario)) {
-            this.usuarioActual = usuarios.get(idUsuario);
-            return true;
-        }
-        return false;
-    }
-
-    // Nuevo métod sobrecargado para VentanaLogin con validación de contraseña
     public boolean iniciarSesion(String idUsuario, String password) {
-        if (idUsuario == null || idUsuario.trim().isEmpty()) {
-            throw new IllegalArgumentException("El campo de usuario no puede estar vacío.");
+        if (idUsuario == null || idUsuario.isBlank() || password == null || password.isBlank()) {
+            return false; // Flujo normal, no excepción
         }
-        if (password == null || password.trim().isEmpty()) {
-            throw new IllegalArgumentException("El campo de contraseña no puede estar vacío.");
-        }
-
         Usuario usuario = usuarios.get(idUsuario.trim());
         if (usuario != null && usuario.validarCredenciales(idUsuario.trim(), password)) {
             this.usuarioActual = usuario;
             return true;
         }
-        throw new IllegalArgumentException("Usuario o contraseña incorrectos.");
+        return false;
     }
 
     public void cerrarSesion() {
@@ -48,32 +35,13 @@ public class AuthController {
         return usuarioActual;
     }
 
-    // Conservado para compatibilidad con Tests unitarios
-    public void registrarUsuario(String id, String nombre, RolUsuario rol) {
-        if (!usuarios.containsKey(id)) {
-            usuarios.put(id, new Usuario(id, nombre, "1234", rol));
-        }
-    }
-
-    // Métod sobrecargado con validaciones completas para VentanaRegistro
     public void registrarUsuario(String id, String nombre, String password, RolUsuario rol) {
-        if (id == null || id.trim().isEmpty()) {
-            throw new IllegalArgumentException("El ID de usuario no puede estar vacío.");
-        }
-        if (nombre == null || nombre.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre no puede estar vacío.");
-        }
-        if (password == null || password.trim().isEmpty()) {
-            throw new IllegalArgumentException("La contraseña no puede estar vacía.");
+        if (id == null || id.trim().isEmpty() || nombre == null || nombre.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("Todos los campos son obligatorios.");
         }
         if (usuarios.containsKey(id.trim())) {
-            throw new IllegalArgumentException("El usuario '" + id + "' ya existe en el sistema.");
+            throw new IllegalArgumentException("El usuario '" + id + "' ya existe.");
         }
-
         usuarios.put(id.trim(), new Usuario(id.trim(), nombre.trim(), password, rol));
-    }
-
-    public boolean existeUsuario(String idUsuario) {
-        return usuarios.containsKey(idUsuario);
     }
 }
